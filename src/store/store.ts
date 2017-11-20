@@ -10,4 +10,12 @@ export class Store {
   get value() {
     return this.state;
   }
+
+  dispatch<T>(action: {type: string, payload: T}) {
+    this.state = {
+      ...this.state,
+      todos: [...this.state.todos, action.payload]
+    };
+    console.log(this.state);
+  }
 }
