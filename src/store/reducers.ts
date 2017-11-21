@@ -2,7 +2,7 @@
 export const initialState = {
   loaded: false,
   loading: false,
-  data: []
+  data: [{ label: 'Eat pizza', complete: false }]
 };
 
 export function reducer(

@@ -4,20 +4,33 @@ export class Store {
   private state: { [key: string]: any };
 
   constructor(reducers = {}, initialState = {}) {
+    this.subscribers = [];
     this.reducers = reducers;
-    this.state = initialState;
+    this.state = this.reduce(initialState, {});;
   }
 
   get value() {
     return this.state;
   }
 
-  dispatch<T>(action: {type: string, payload: T}) {
-    this.state = this.reduce(this.state, action);
-    console.log(this.state);
+  subscribe(fn) {
+    this.subscribers = [...this.subscribers, fn];
+    this.notify();
+    return () => {
+      this.subscribers = this.subscribers.filter(sub => sub !== fn);
+    }
   }
 
-  private reduce<T>(state: any, action: {type: string, payload: T}) {
+  dispatch<T>(action: {type: string, payload: T}) {
+    this.state = this.reduce(this.state, action);
+    this.notify();
+  }
+
+  private notify() {
+    this.subscribers.forEach(fn => fn(this.value));
+  }
+
+  private reduce<T>(state: any, action: {type?: string, payload?: T}) {
     const newState = {};
     for (const prop in this.reducers) {
       newState[prop] = this.reducers[prop](state[prop], action);
